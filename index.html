@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MongoDB Query Solutions</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            color: #333;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        pre {
+            background-color: #f4f4f4;
+            border-left: 4px solid #2c3e50;
+            padding: 10px;
+            overflow-x: auto;
+        }
+        code {
+            background-color: #f9f9f9;
+            padding: 2px 5px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+        .query {
+            margin-bottom: 20px;
+        }
+        .result {
+            background-color: #ecf0f1;
+            padding: 10px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>MongoDB Query Solutions</h1>
+
+    <div class="query">
+        <h2>1. Find all movies where:</h2>
+        <div class="result">
+            <p><b>Runtime is greater than 150 minutes:</b></p>
+            <pre><code>db.movies.find({runtime:{$gt:150}}).count()</code></pre>
+
+            <p><b>Rating is higher than 8.5:</b></p>
+            <pre><code>db.movies.find({rating:{$gt:8.5}}).count()</code></pre>
+
+            <p><b>Year is between 2000 and 2015 (inclusive):</b></p>
+            <pre><code>db.movies.find({year:{$gt:2000,$lt:2015}}).count()</code></pre>
+
+            <p><b>Box office earnings were less than 500 million OR greater than 1 billion:</b></p>
+            <pre><code>db.movies.find({$or:[{boxOffice:{$gt:1000.0}},{boxOffice:{$lt:500.0}}]}).count()</code></pre>
+        </div>
+    </div>
+
+    <div class="query">
+        <h2>2. Find movies directed by Christopher Nolan that won an Oscar, made more than 700 million at box office, and are available on Netflix:</h2>
+        <pre><code>db.movies.find({$and:[{director:"Christopher Nolan"},{isOscarWinner:true},{boxOffice:{$gt:700}},{streamingOn:"Netflix"}]}).count()</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>3. Find movies that have special features, where both behind-the-scenes content and deleted scenes are available:</h2>
+        <pre><code>db.movies.find({"specialFeatures.deletedScenes":true,"specialFeatures.behindTheScenes":true}).count()</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>4. Find movies where either Carrie-Anne Moss or Morgan Freeman is in the cast, have language options available, and can be watched on at least 2 streaming platforms:</h2>
+        <pre><code>db.movies.find({$and:[{$or:[{cast:"Carrie-Anne Moss"},{cast:"Morgan Freeman"}]},{languages:{$exists:true}},{streamingOn:{$size:2}}]},{title:true,_id:false})</code></pre>
+        <p>Result:</p>
+        <div class="result">
+            <code>[ { title: 'The Matrix' } ]</code>
+        </div>
+    </div>
+
+    <div class="query">
+        <h2>5. For the movie "Inception", add Chinese to its languages:</h2>
+        <pre><code>db.movies.updateOne({title:"Inception"},{$push:{languages:"Chinese"}})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>6. Add Michael Caine to the cast of all Christopher Nolan movies:</h2>
+        <pre><code>db.movies.updateMany({director:"Christopher Nolan"},{$push:{cast:"Michael Caine"}})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>7. Add Disney+ as a streaming option for all movies longer than 140 minutes:</h2>
+        <pre><code>db.movies.updateMany({runtime:{$gt:140}},{$push:{streamingOn:"Disney+"}})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>8. Find movies that have exactly 2 genres and have box office earnings listed, but don't have any special features:</h2>
+        <pre><code>db.movies.find({genre:{$size:2}},{boxOffice:true,_id:false})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>9. Remove all movies with rating less than 8.0:</h2>
+        <pre><code>db.movies.deleteMany({rating:{$lt:8.0}})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>10. Remove Netflix from the streaming platforms of all movies released before 2000:</h2>
+        <pre><code>db.movies.updateMany({year:{$lt:2000}},{$pull:{streamingOn:"Netflix"}})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>11. Find movies where box office earnings are more than 10 times the runtime:</h2>
+        <pre><code>db.movies.find({$expr:{$gt:["$boxOffice",{$multiply:["$runtime",10]}]}},{_id:false ,title:true})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>13. Find movies that have both "Action" and "Sci-Fi" in their genres:</h2>
+        <pre><code>db.movies.find({$and:[{genre:"Action"},{genre:"Sci-Fi"}]})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>14. Find movies where "Action" is the first genre listed:</h2>
+        <pre><code>db.movies.find({"genre.0":"Action"})</code></pre>
+    </div>
+
+    <div class="query">
+        <h2>15. Find movies that have exactly 3 cast members:</h2>
+        <pre><code>db.movies.find({cast:{$size:3}})</code></pre>
+    </div>
+</body>
+</html>
